@@ -29,14 +29,14 @@ compile: $(ARTIFACTS_DIR)
 
 # Perform the trusted setup (powers of tau)
 setup: compile
-	# Phase 1: Start a new powers of tau ceremony with increased power
-	${SNARKJS} powersoftau new bn128 16 $(PTAU_FILE) -v
+	# Phase 1: Start a new powers of tau ceremony
+	${SNARKJS} powersoftau new bn128 16 $(ARTIFACTS_DIR)/pot16_0000.ptau -v
 
 	# Phase 2: Contribute to the ceremony with entropy
-	${SNARKJS} powersoftau contribute $(PTAU_FILE) $(PTAU_FILE) --name="First Contributor" -v -e="$(shell head -n 4096 /dev/urandom | openssl sha1)"
+	${SNARKJS} powersoftau contribute $(ARTIFACTS_DIR)/pot16_0000.ptau $(ARTIFACTS_DIR)/pot16_0001.ptau --name="First Contributor" -v -e="$(shell head -n 4096 /dev/urandom | openssl sha1)"
 
-	# Phase 3: Prepare for phase 2
-	${SNARKJS} powersoftau prepare phase2 $(PTAU_FILE) $(PTAU_FILE) -v
+	# Prepare for phase 2
+	${SNARKJS} powersoftau prepare phase2 $(ARTIFACTS_DIR)/pot16_0001.ptau $(PTAU_FILE) -v -e="$(shell head -n 4096 /dev/urandom | openssl sha1)"
 
 	# Generate the .zkey file
 	${SNARKJS} groth16 setup $(R1CS_FILE) $(PTAU_FILE) $(ZKEY_FILE)

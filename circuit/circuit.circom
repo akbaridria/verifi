@@ -70,4 +70,4 @@ template Main() {
     featureValidator.computedValue === secretValue;
 }
 
-component main {public [address, expected_hash, secretValue]} = Main();
+component main {public [address]} = Main();
