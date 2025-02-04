@@ -2,13 +2,15 @@
 
 help:
 	@echo "Usage:"
-	@echo "  make build         - Build"
-	@echo "  make test          - Run forge tests"
-	@echo "  make deploy-edu    - Deploy to EDU testnet"
-	@echo "  make deploy-arb    - Deploy to Arbitrum testnet"
-	@echo "  make clean         - Remove artifacts"
-	@echo "  make Format        - format code"
-	@echo "  make Install       - install dependencies"
+	@echo "  make build                  - Build"
+	@echo "  make test                   - Run forge tests"
+	@echo "  make deploy-edu             - Deploy to EDU testnet"
+	@echo "  make deploy-arb             - Deploy to Arbitrum testnet"
+	@echo "  make verify-contract-edu    - Verify contract in EDU testnet"
+	@echo "  make verify-contract-arb    - Verify contract in Arbitrum testnet"
+	@echo "  make clean                  - Remove artifacts"
+	@echo "  make Format                 - format code"
+	@echo "  make Install                - install dependencies"
 
 # Build & Test
 build:
@@ -49,6 +51,17 @@ deploy-arb:
 		--rpc-url ${ARB_RPC_URL} \
 		--private-key ${PRIVATE_KEY} \
 		--constructor-args ${ZKV_CONTRACT_ARB} ${VK_HASH}
+
+# Verify contract in Arb Sepolia testnet
+verify-contract-arb:
+	@echo "Verifying contract on Arbitrum testnet..."
+	@forge verify-contract \
+		--rpc-url ${ARB_RPC_URL} \
+		${VERIFI_ARB_CONTRACT} \
+		src/VeriFi.sol:VeriFi \
+		--verifier etherscan \
+		--verifier-api-key ${ARBISCAN_API_KEY} \
+		--verifier-url https://api-sepolia.arbiscan.io/api/
 
 # Format code
 format:
