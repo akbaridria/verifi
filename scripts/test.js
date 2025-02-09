@@ -26,8 +26,6 @@ async function generateInputs(evmAccount) {
     secretSalt,
   ]);
 
-  let nullifier = poseidon.F.toString(poseidon([BigInt(evmAccount)]));
-
   let secretValue =
     faceEmbeddings[3] * 2 +
     (faceEmbeddings[7] - 1000) +
@@ -38,7 +36,6 @@ async function generateInputs(evmAccount) {
     address: evmAccount,
     face_embeddings: faceEmbeddings,
     expected_hash: expectedHash,
-    nullifier: nullifier,
     secretSalt: secretSalt.toString(),
     secretValue: secretValue.toString(),
   };
@@ -78,16 +75,12 @@ async function generateProof(evmAccount) {
     "./circuit/artifacts/circuit.zkey"
   );
 
-  console.log("Proof generated!!");
+  console.log("Proof generated!!", publicSignals);
 
   return {
     proof,
     publicSignals,
   };
-}
-
-function convertStringToBytes(string, number = 32) {
-  return ethers.zeroPadBytes(ethers.toBeHex(string), number);
 }
 
 async function verifyProof() {
@@ -106,8 +99,6 @@ async function verifyProof() {
   const vk = JSON.parse(
     fs.readFileSync("./circuit/artifacts/verification_key.json")
   );
-
-  const nullifierHash = convertStringToBytes(publicSignals[0]);
 
   // Establish a session with zkVerify
   const session = await zkVerifySession
@@ -178,8 +169,7 @@ async function verifyProof() {
     "constructor(address _zkvContract, bytes32 _vkHash)",
     "function PROVING_SYSTEM_ID() view returns (bytes32)",
     "function isVerified(address) view returns (bool)",
-    "function proveYouAreHuman(uint256 attestationId, bytes32[] calldata merklePath, bytes32 leaf, uint256 leafCount, uint256 index, bytes32 nullifierHash)",
-    "function usedNullifierHashes(bytes32) view returns (bool)",
+    "function proveYouAreHuman(uint256 attestationId, bytes32[] calldata merklePath, uint256 leafCount, uint256 index)",
     "function vkHash() view returns (bytes32)",
     "function zkvContract() view returns (address)",
     "event SuccessfulProofSubmission(address indexed from)",
@@ -205,10 +195,8 @@ async function verifyProof() {
     const txResponse = await appContract.proveYouAreHuman(
       attestationId,
       merkleProof,
-      leafDigest,
       numberOfLeaves,
-      leafIndex,
-      nullifierHash
+      leafIndex
     );
     const { hash } = await txResponse;
     console.log(`Tx sent to EVM, tx-hash ${hash}`);

@@ -8,7 +8,6 @@ contract VeriFi {
     bytes32 public immutable vkHash;
 
     mapping(address => bool) public isVerified;
-    mapping(bytes32 => bool) public usedNullifierHashes;
 
     event SuccessfulProofSubmission(address indexed from);
 
@@ -17,29 +16,27 @@ contract VeriFi {
         vkHash = _vkHash;
     }
 
-    function proveYouAreHuman(
-        uint256 attestationId,
-        bytes32[] calldata merklePath,
-        bytes32 leaf,
-        uint256 leafCount,
-        uint256 index,
-        bytes32 nullifierHash
-    ) external {
-        require(!usedNullifierHashes[nullifierHash], "Nullifier already used");
+    function proveYouAreHuman(uint256 attestationId, bytes32[] calldata merklePath, uint256 leafCount, uint256 index)
+        external
+    {
         require(!isVerified[msg.sender], "Address already verified");
-        require(_verifyProofHasBeenPostedToZkv(attestationId, leaf, merklePath, leafCount, index));
-        usedNullifierHashes[nullifierHash] = true;
+        require(_verifyProofHasBeenPostedToZkv(attestationId, msg.sender, merklePath, leafCount, index));
         isVerified[msg.sender] = true;
         emit SuccessfulProofSubmission(msg.sender);
     }
 
     function _verifyProofHasBeenPostedToZkv(
         uint256 attestationId,
-        bytes32 leaf,
+        address inputAddress,
         bytes32[] calldata merklePath,
         uint256 leafCount,
         uint256 index
     ) internal view returns (bool) {
+        bytes32 leaf = keccak256(
+            abi.encodePacked(
+                PROVING_SYSTEM_ID, vkHash, keccak256(abi.encodePacked(_changeEndianess(uint256(uint160(inputAddress)))))
+            )
+        );
         (bool callSuccessful, bytes memory validProof) = zkvContract.staticcall(
             abi.encodeWithSignature(
                 "verifyProofAttestation(uint256,bytes32,bytes32[],uint256,uint256)",

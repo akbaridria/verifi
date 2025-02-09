@@ -44,10 +44,8 @@ template Main() {
     signal input address;               // Ethereum address of the user
     signal input face_embeddings[128];  // Scaled face embeddings
     signal input expected_hash;         // The expected Poseidon hash
-    signal input nullifier;             // Nullifier (private input)
     signal input secretValue;           // Expected result from feature validation
     signal input secretSalt;            // Secret salt known only to the system
-    signal output nullifierHash;        // Nullifier hash (public output)
 
     // Hash the embeddings (including secret salt)
     component poseidonHasher = PoseidonHash129();
@@ -56,11 +54,6 @@ template Main() {
     }
     poseidonHasher.embeddings[128] <== secretSalt; // Include the secret salt in the hash
     poseidonHasher.hashOutput === expected_hash;
-
-    // Compute nullifier hash
-    component nullifierHasher = Poseidon(1);
-    nullifierHasher.inputs[0] <== nullifier;
-    nullifierHash <== nullifierHasher.out; // this will be use to make sure that the nullifier is not reused on-chain
 
     // Validate feature vector using a formula
     component featureValidator = FeatureValidation();
