@@ -100,7 +100,6 @@ require(verifi.isVerified(msg.sender), "VeriFi verification required");
 ### Repository Structure
 - `/contract`: Smart contract implementation
 - `/circuit`: Zero-knowledge circuit implementation
-- `/landing`: Landing page assets and content
 
 ### Frontend Repository
 For the frontend implementation, visit our separate repository:
