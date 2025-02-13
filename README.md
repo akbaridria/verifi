@@ -94,3 +94,22 @@ bool isHuman = verifi.isVerified(userAddress);
 ```solidity
 require(verifi.isVerified(msg.sender), "VeriFi verification required");
 ```
+
+## Notes
+
+### Repository Structure
+- `/contract`: Smart contract implementation
+- `/circuit`: Zero-knowledge circuit implementation
+- `/landing`: Landing page assets and content
+
+### Frontend Repository
+For the frontend implementation, visit our separate repository:
+[VeriFi Frontend Repository](https://github.com/akbaridria/verifi-frontend) 👈 Click here to see our React-based frontend implementation
+
+### Development Status
+- ✅ Smart Contract (Complete)
+- ✅ ZK Circuit (Complete)
+- ✅ Frontend (In separate repo)
+
+### Contributing
+We welcome contributions! Please read our [contributing guidelines](CONTRIBUTING.md) before submitting PRs.
